@@ -45,7 +45,7 @@ type RedeemCode = {
   source: Source
 }
 
-const today = '2026-07-10'
+const today = '2026-07-11'
 const codesPerPage = 10
 const facesDisplayLimit = 30
 
