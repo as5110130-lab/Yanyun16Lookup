@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import './App.css'
 
 type Tab = 'home' | 'faces' | 'music' | 'martial' | 'codes' | 'converter'
@@ -1101,6 +1101,9 @@ function App() {
   const [codesPage, setCodesPage] = useState(1)
   const [codeYearFilter, setCodeYearFilter] = useState('all')
   const [codeMonthFilter, setCodeMonthFilter] = useState('all')
+  const headerStyle = {
+    '--home-background': `url("${import.meta.env.BASE_URL}images/home-background.jpg")`,
+  } as CSSProperties
 
   const queryText = query.trim().toLowerCase()
 
@@ -1237,7 +1240,7 @@ function App() {
 
   return (
     <main>
-      <header className="app-header">
+      <header className="app-header" style={headerStyle}>
         <div>
           <p className="eyebrow">Where Winds Meet Lookup</p>
           <h1>燕雲十六聲資料查詢</h1>
