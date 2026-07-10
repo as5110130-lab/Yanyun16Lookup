@@ -14,7 +14,7 @@ main {
   background:
     linear-gradient(90deg, rgba(5, 10, 18, 0.82) 0%, rgba(5, 10, 18, 0.58) 42%, rgba(5, 10, 18, 0.18) 100%),
     linear-gradient(0deg, rgba(5, 10, 18, 0.72) 0%, rgba(5, 10, 18, 0.05) 46%),
-    url('/images/home-background.jpg') center / cover no-repeat;
+    url('images/home-background.jpg') center / cover no-repeat;
   border-bottom: 1px solid #1f2b37;
   overflow: hidden;
 }
