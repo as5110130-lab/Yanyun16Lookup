@@ -23,3 +23,10 @@ button,
 input {
   letter-spacing: 0;
 }
+
+@media (max-width: 760px) {
+  body {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+}
