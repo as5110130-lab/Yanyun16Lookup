@@ -1084,7 +1084,7 @@ const redeemCodes: RedeemCode[] = [
 ]
 
 const tabMeta: Record<Tab, { label: string; hint: string }> = {
-  home: { label: '首頁', hint: '最新公告與網站更新' },
+  home: { label: '公告', hint: '最新公告與網站更新' },
   faces: { label: '捏臉數據', hint: '官方萬相集公開口令與使用說明' },
   music: { label: '戲樂數據', hint: '戲樂模式、動作套用與版本狀態' },
   martial: { label: '武學流派', hint: '主副武學、心法、場景與難度' },
