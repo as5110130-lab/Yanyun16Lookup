@@ -15,6 +15,7 @@ type FacePreset = {
 }
 
 type FaceSourceStatus = '國際服確認' | '陸服來源未驗證'
+type CodeExpiryFilter = 'all' | 'active' | 'expired' | 'uncertain'
 
 type MusicEntry = {
   title: string
@@ -1101,13 +1102,14 @@ function App() {
   const [codesPage, setCodesPage] = useState(1)
   const [codeYearFilter, setCodeYearFilter] = useState('all')
   const [codeMonthFilter, setCodeMonthFilter] = useState('all')
+  const [codeExpiryFilter, setCodeExpiryFilter] = useState<CodeExpiryFilter>('all')
   const homeBackgroundUrl = `${import.meta.env.BASE_URL}images/home-background.jpg`
 
   const queryText = query.trim().toLowerCase()
 
   useEffect(() => {
     setCodesPage(1)
-  }, [queryText, codeYearFilter, codeMonthFilter])
+  }, [queryText, codeYearFilter, codeMonthFilter, codeExpiryFilter])
 
   const filteredFaces = useMemo(
     () =>
@@ -1186,14 +1188,20 @@ function App() {
             .includes(queryText)
           const matchesYear = codeYearFilter === 'all' || item.date.startsWith(codeYearFilter)
           const matchesMonth = codeMonthFilter === 'all' || item.date.slice(5, 7) === codeMonthFilter
+          const matchesExpiry =
+            codeExpiryFilter === 'all' ||
+            (codeExpiryFilter === 'active' &&
+              (item.status === '官方確認' || item.status === '社群彙整')) ||
+            (codeExpiryFilter === 'expired' && item.status === '已過期') ||
+            (codeExpiryFilter === 'uncertain' && item.status === '可能過期')
 
-          return matchesQuery && matchesYear && matchesMonth
+          return matchesQuery && matchesYear && matchesMonth && matchesExpiry
         })
         .sort(
           (first, second) =>
             second.date.localeCompare(first.date) || first.code.localeCompare(second.code),
         ),
-    [codeMonthFilter, codeYearFilter, queryText],
+    [codeExpiryFilter, codeMonthFilter, codeYearFilter, queryText],
   )
 
   const totalCodePages = Math.max(1, Math.ceil(filteredCodes.length / codesPerPage))
@@ -1409,6 +1417,18 @@ function App() {
                     {Number(month)} 月
                   </option>
                 ))}
+              </select>
+            </label>
+            <label>
+              <span>狀態</span>
+              <select
+                onChange={(event) => setCodeExpiryFilter(event.target.value as CodeExpiryFilter)}
+                value={codeExpiryFilter}
+              >
+                <option value="all">全部狀態</option>
+                <option value="active">未過期</option>
+                <option value="expired">已過期</option>
+                <option value="uncertain">未確定過期</option>
               </select>
             </label>
           </div>
