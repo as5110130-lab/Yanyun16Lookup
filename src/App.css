@@ -110,7 +110,7 @@ h3 {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -129,9 +129,18 @@ button:hover {
 
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
 a:focus-visible {
   outline: 3px solid rgba(47, 127, 115, 0.28);
   outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
 }
 
 .tabs button {
@@ -189,6 +198,41 @@ a:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.converter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.face-filter-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  color: #526071;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.face-filter-bar button {
+  min-height: 36px;
+  padding: 0 16px;
+  font-weight: 800;
+}
+
+.face-filter-bar button.active {
+  color: #ffffff;
+  background: #22453f;
+  border-color: #22453f;
+}
+
+.face-filter-bar span {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .pagination {
   grid-column: 1 / -1;
   display: flex;
@@ -201,6 +245,66 @@ a:focus-visible {
   border: 1px solid #d8dee8;
   border-radius: 8px;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.code-filter-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  color: #526071;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.code-filter-bar label {
+  display: grid;
+  gap: 6px;
+  min-width: 160px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.code-filter-bar select {
+  min-height: 38px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  padding: 0 34px 0 12px;
+  color: #172033;
+  background: #ffffff;
+  font: 15px/1.2 system-ui, 'Microsoft JhengHei', sans-serif;
+}
+
+.converter-card textarea {
+  min-height: 180px;
+  resize: vertical;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  padding: 12px;
+  color: #172033;
+  background: #ffffff;
+  font: 15px/1.5 Consolas, 'Microsoft JhengHei', monospace;
+}
+
+.converter-card button {
+  justify-self: start;
+  min-height: 38px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #2f7f73;
+  border-color: #2f7f73;
+  font-weight: 800;
+}
+
+.converter-note {
+  grid-column: span 1;
+}
+
+.converter-note .source-link {
+  display: block;
 }
 
 .pagination > div {
@@ -260,6 +364,21 @@ a:focus-visible {
   padding: 18px;
 }
 
+.face-card {
+  overflow: hidden;
+  padding-top: 14px;
+}
+
+.face-preview {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center top;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #edf2f7;
+}
+
 .card-top {
   display: flex;
   gap: 12px;
@@ -271,6 +390,27 @@ a:focus-visible {
   flex: 0 0 auto;
   min-width: 72px;
   min-height: 36px;
+  padding: 0 12px;
+  color: #ffffff;
+  background: #2f7f73;
+  border-color: #2f7f73;
+  font-weight: 800;
+}
+
+.code-copy-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.code-copy-row code {
+  min-width: 0;
+}
+
+.code-copy-row button {
+  min-width: 72px;
+  min-height: 100%;
   padding: 0 12px;
   color: #ffffff;
   background: #2f7f73;
@@ -302,7 +442,8 @@ ol {
 
 .tags span,
 .pill,
-.status {
+.status,
+.face-source-status {
   display: inline-flex;
   width: fit-content;
   align-items: center;
@@ -357,6 +498,18 @@ ol {
 }
 
 .status-可能過期 {
+  color: #7c2d12;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.status-國際服確認 {
+  color: #164e63;
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+
+.status-陸服來源未驗證 {
   color: #7c2d12;
   background: #fff7ed;
   border-color: #fed7aa;

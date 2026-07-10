@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
-type Tab = 'faces' | 'music' | 'martial' | 'codes'
+type Tab = 'faces' | 'music' | 'martial' | 'codes' | 'converter'
 type Source = { label: string; url: string }
 
 type FacePreset = {
   name: string
   author: string
   code: string
+  imageUrl: string
   style: string[]
   sourceNote: string
   source: Source
 }
+
+type FaceSourceStatus = '國際服確認' | '陸服來源未驗證'
 
 type MusicEntry = {
   title: string
@@ -44,12 +47,14 @@ type RedeemCode = {
 
 const today = '2026-07-10'
 const codesPerPage = 10
+const facesDisplayLimit = 30
 
 const sources = {
   officialFace:
     'https://www.yysls.cn/news/official/20250107/37780_1204881.html',
   officialFix: 'https://www.yysls.cn/news/update/20260529/40412_1302289.html',
   taptapFaces: 'https://www.taptap.cn/moment/626025738641869176',
+  taptapFaceCollection: 'https://www.taptap.cn/app/239372/strategy/entity-collection/334588',
   taptapGuide: 'https://www.taptap.cn/moment/625904977906240486',
   gamersky: 'https://www.gamersky.com/handbook/202601/2073807.shtml',
   threeDm: 'https://www.3dmgame.com/gl/3976209.html',
@@ -69,6 +74,11 @@ const sources = {
   facebookPalace:
     'https://www.facebook.com/groups/1031152431953437/posts/1563044495430892/',
   arlenCodes: 'https://www.arlenfuture.com/games/where-winds-meet-codes/',
+  wwmPresets: 'https://wwmpresets.com/',
+  steamPresetBot: 'https://steamcommunity.com/sharedfiles/filedetails/?id=3625052726',
+  bahaFaceConvert: 'https://forum.gamer.com.tw/C.php?bsn=75703&snA=7049',
+  youtubeFaceConvert: 'https://www.youtube.com/watch?v=vN0q2GhsF2s',
+  wwmWorkshopDiscord: 'https://discord.com/servers/wwm-workshop-1444832179061391542',
   youtubeJulyCodes: 'https://www.youtube.com/post/UgkxDtv_rgo58IPJSaOVp0nYQKHF_co1Fy5Y',
   musicGuide: 'https://news.17173.com/content/11022025/192549381.shtml',
   musicForum: 'https://forum.gamer.com.tw/C.php?bsn=75703&snA=6014',
@@ -79,67 +89,215 @@ const facePresets: FacePreset[] = [
     name: '深雪',
     author: '水咲',
     code: 'ARTZ2+TGEBa4Rgec96w',
+    imageUrl: '/images/faces/shenxue.jpg',
     style: ['女角', '冷感', '萬相集公開'],
-    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料。',
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '點絳唇',
     author: '幻闕歌',
     code: 'ARTZ3K/SqmG8gckuoLD',
+    imageUrl: '/images/faces/dianjiangchun.jpg',
     style: ['女角', '古典', '萬相集公開'],
-    sourceNote: '官方公告確認可透過萬相集、二維碼或口令匯入捏臉資料。',
-    source: { label: '官方萬相集匯入說明', url: sources.officialFace },
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '自用',
+    author: '泠芳攜',
+    code: 'ARTZ3ZcUFevCyC1qg2i',
+    imageUrl: '/images/faces/ziyou-lingfangxie.jpg',
+    style: ['男角', '俊逸', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '很像啊',
+    author: '望兮子',
+    code: 'ARTZ24QV/e4DVnCJ/qM',
+    imageUrl: '/images/faces/henxiang-a.jpg',
+    style: ['女角', '華麗', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '寧姚',
     author: '風翎絮',
     code: 'ARTZ2+cZpK56JcOuaD2',
+    imageUrl: '/images/faces/ningyao.jpg',
     style: ['女角', '俐落', '萬相集公開'],
-    sourceNote: '來自遊戲內萬相集公開資料整理。',
+    sourceNote: '來自遊戲內萬相集公開資料整理；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '浣溪沙',
     author: '幻闕歌',
     code: 'ARTZ3Zfs6mG8vgjMgMb',
+    imageUrl: '/images/faces/huanxisha.jpg',
     style: ['女角', '柔和', '萬相集公開'],
-    sourceNote: '複製口令後可於遊戲內識別匯入。',
+    sourceNote: '複製口令後可於遊戲內識別匯入；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '淡妝',
     author: '沈知書',
     code: 'ARTZ3I2ZOaX8IXNg+Ti',
+    imageUrl: '/images/faces/danzhuang.jpg',
     style: ['女角', '淡雅', '萬相集公開'],
-    sourceNote: '若萬相集作品被設為不可套用，請以遊戲內狀態為準。',
-    source: { label: '官方萬相集修復公告', url: sources.officialFix },
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '自用',
+    author: '鶴歸歸',
+    code: 'ARTZ26HTM62H3IbG5Sm',
+    imageUrl: '/images/faces/ziyou-heguigui.jpg',
+    style: ['男角', '冷感', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '楚楚可憐小狐狸',
     author: '祈雪千千鈴',
     code: 'ARTZ25R4Prt2QLTTu9f',
+    imageUrl: '/images/faces/fox.jpg',
     style: ['女角', '可愛', '萬相集公開'],
-    sourceNote: '來自遊戲內萬相集公開資料整理。',
+    sourceNote: '來自遊戲內萬相集公開資料整理；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '風',
     author: '聶莫黎',
     code: 'ARTZ24NlI29q4QFFThj',
+    imageUrl: '/images/faces/feng.jpg',
     style: ['女角', '清冷', '萬相集公開'],
-    sourceNote: '來自遊戲內萬相集公開資料整理。',
+    sourceNote: '來自遊戲內萬相集公開資料整理；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '倉鼠飛輪2號',
+    author: '北冥晴雪',
+    code: 'ARTZ24PHx8yFYQdAriJ',
+    imageUrl: '/images/faces/hamster-wheel-2.jpg',
+    style: ['女角', '柔和', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '嫂嫂',
+    author: '雯少',
+    code: 'ARTZ3KXQ/wuiToh9YDy',
+    imageUrl: '/images/faces/saosao.jpg',
+    style: ['男角', '俊逸', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '自用',
+    author: '邪惡小比嘎',
+    code: 'ARTZ3CP+pUD3lbGfUgd',
+    imageUrl: '/images/faces/ziyou-xiee.jpg',
+    style: ['女角', '甜美', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '看我',
+    author: '吃象象',
+    code: 'ARTZ3LMvCm7cCEL3NAC',
+    imageUrl: '/images/faces/kanwo.jpg',
+    style: ['男角', '冷感', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '12',
+    author: '藺琳霖',
+    code: 'ARTZ2+NKAOckRDd67uN',
+    imageUrl: '/images/faces/twelve.jpg',
+    style: ['女角', '成熟', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '芊芊',
+    author: '月搖情',
+    code: 'ARTZ26vNvc5dpX+W4sB',
+    imageUrl: '/images/faces/qianqian.jpg',
+    style: ['女角', '華麗', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '123',
+    author: '和隹之',
+    code: 'ARTZ28gLFFEId36uQEf',
+    imageUrl: '/images/faces/one-two-three.jpg',
+    style: ['男角', '俊逸', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '無量',
+    author: '頂流',
+    code: 'ARTZ3Vy6yFfdcK5p4mi',
+    imageUrl: '/images/faces/wuliang.jpg',
+    style: ['男角', '冷感', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '無',
+    author: '葉念安',
+    code: 'ARTZ25EymjoQSLHLXlT',
+    imageUrl: '/images/faces/wu.jpg',
+    style: ['男角', '俊逸', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '少先行',
+    author: '御刀郎',
+    code: 'ARTZ3V4VGH+VJgG5CkC',
+    imageUrl: '/images/faces/shaoxianxing.jpg',
+    style: ['男角', '俊逸', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '坐小孩那桌',
+    author: '薛岱淵',
+    code: 'ARTZ3fSS668wJ7+fP9K',
+    imageUrl: '/images/faces/kid-table.jpg',
+    style: ['女角', '俐落', '萬相集公開'],
+    sourceNote: 'TapTap 轉載標註：資料來自遊戲內萬相集公開資料；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
   {
     name: '師姐',
     author: '晚聲',
     code: 'ARTZ3EFpifzWpUiyVRS',
+    imageUrl: '/images/faces/shijie.jpg',
     style: ['女角', '成熟', '萬相集公開'],
-    sourceNote: '來自遊戲內萬相集公開資料整理。',
+    sourceNote: '來自遊戲內萬相集公開資料整理；圖片為同篇捏臉預覽。',
+    source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
+  },
+  {
+    name: '予江湖',
+    author: '予牽機',
+    code: 'ARTZ25y85K56IYOUL4i',
+    imageUrl: '/images/faces/yujianghu.jpg',
+    style: ['男角', '華麗', '萬相集公開'],
+    sourceNote: '來自遊戲內萬相集公開資料整理；圖片為同篇捏臉預覽。',
     source: { label: 'TapTap 萬相集公開捏臉整理', url: sources.taptapFaces },
   },
 ]
+
+const getFaceSourceStatus = (item: FacePreset): FaceSourceStatus =>
+  item.source.url === sources.taptapFaces || item.source.url === sources.taptapFaceCollection
+    ? '陸服來源未驗證'
+    : '國際服確認'
 
 const musicEntries: MusicEntry[] = [
   {
@@ -372,83 +530,91 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'TPCF3FEN6Y',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'NK4AJFPDWC',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'JJXDTKCD8Y',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
-    code: 'swcqqqhwae',
-    date: '2026-07-04',
+    code: 'SWCQQQHWAE',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
+  },
+  {
+    code: 'SY3KQQE8KR',
+    date: '2026-07-03',
+    expiresAt: '未公告，請以遊戲內為準',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
+    status: '社群彙整',
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'KPC346C44A',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'PJCXEP4MFT',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'FHHXEYRJAN',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'APE6NNXY4K',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'NDETCQEXHF',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'CP8WMH8W4C',
-    date: '2026-07-04',
+    date: '2026-07-03',
     expiresAt: '未公告，請以遊戲內為準',
-    reward: '7/4 社群提供序號，獎勵以遊戲內收件匣為準。',
+    reward: '7/3 社群提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
-    source: { label: '使用者提供 7/4 序號', url: sources.bahaCodes },
+    source: { label: '使用者提供 7/3 序號', url: sources.bahaCodes },
   },
   {
     code: 'XM8AQFRCPX',
@@ -620,7 +786,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'WWMREDDIT0625',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -628,7 +794,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'FHKD7HHWRJ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -636,7 +802,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HD8PHDX443',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -644,7 +810,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'NKTTCPETYC',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -652,7 +818,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'KAAYFMX7HP',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -660,7 +826,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'MKTQJR3DMA',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -668,7 +834,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'RNTF3MMTMR',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -676,7 +842,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HSWW3NCEKY',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -684,7 +850,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HSM84QD8DQ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -692,7 +858,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'PXYR8M4AJJ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -700,7 +866,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'FXA7WPXP6C',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -708,7 +874,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HD4CRCHPTN',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -716,7 +882,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'WH7PRYFFPA',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -724,7 +890,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'MAWQA8HR48',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -732,7 +898,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'ARN8KQJAET',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -740,7 +906,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'RP68WW3NY6',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -748,7 +914,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'QSD4JECMQD',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -756,7 +922,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'NSAHT7AHKJ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -764,7 +930,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'YY3NQAJ7WJ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -772,7 +938,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'FN6AHA3T7N',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -780,7 +946,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'SE3RNWEDAT',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -788,7 +954,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'RYCDP8MMNH',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -796,7 +962,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'KERYF4RXM4',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -804,7 +970,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'KJ4YF433MN',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -812,7 +978,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'KWAFCWDFJF',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -820,7 +986,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'XQFWEQMKMX',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -828,7 +994,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'KRDA7X3AXY',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -836,7 +1002,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'CW4AP7AA6T',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -844,7 +1010,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'NY4TTJKEKQ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -852,7 +1018,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'PAM46YAQ86',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -860,7 +1026,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'EKMW673Q8A',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -868,7 +1034,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HK367A6FDJ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -876,7 +1042,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'DTXHCJ6DNN',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -884,7 +1050,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'TD8XMRKJMK',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -892,7 +1058,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'THMQNAFXQC',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -900,7 +1066,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'YYP4QNC7NQ',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -908,7 +1074,7 @@ const redeemCodes: RedeemCode[] = [
   },
   {
     code: 'HH6AM6C8RF',
-    date: '2026-07-10',
+    date: '2026-06-29',
     expiresAt: '未公告，請以遊戲內為準',
     reward: '使用者提供序號，獎勵以遊戲內收件匣為準。',
     status: '社群彙整',
@@ -921,29 +1087,45 @@ const tabMeta: Record<Tab, { label: string; hint: string }> = {
   music: { label: '戲樂數據', hint: '戲樂模式、動作套用與版本狀態' },
   martial: { label: '武學流派', hint: '主副武學、心法、場景與難度' },
   codes: { label: '兌換碼', hint: `整理範圍：2026-05 到 ${today}` },
+  converter: { label: '轉碼工具', hint: '陸服臉碼轉國際服待驗證流程' },
 }
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('codes')
   const [query, setQuery] = useState('')
-  const [copied, setCopied] = useState('')
+  const [copiedCodes, setCopiedCodes] = useState<string[]>([])
+  const [faceGenderFilter, setFaceGenderFilter] = useState<'all' | '女角' | '男角'>('all')
+  const [cnFaceCode, setCnFaceCode] = useState('')
+  const [globalFaceCode, setGlobalFaceCode] = useState('')
   const [codesPage, setCodesPage] = useState(1)
+  const [codeYearFilter, setCodeYearFilter] = useState('all')
+  const [codeMonthFilter, setCodeMonthFilter] = useState('all')
 
   const queryText = query.trim().toLowerCase()
 
   useEffect(() => {
     setCodesPage(1)
-  }, [queryText])
+  }, [queryText, codeYearFilter, codeMonthFilter])
 
   const filteredFaces = useMemo(
     () =>
-      facePresets.filter((item) =>
-        [item.name, item.author, item.code, ...item.style, item.sourceNote]
+      facePresets.filter((item) => {
+        const matchesQuery = [
+          item.name,
+          item.author,
+          item.code,
+          ...item.style,
+          item.sourceNote,
+          getFaceSourceStatus(item),
+        ]
           .join(' ')
           .toLowerCase()
-          .includes(queryText),
-      ),
-    [queryText],
+          .includes(queryText)
+        const matchesGender = faceGenderFilter === 'all' || item.style.includes(faceGenderFilter)
+
+        return matchesQuery && matchesGender
+      }),
+    [faceGenderFilter, queryText],
   )
 
   const filteredMusic = useMemo(
@@ -976,20 +1158,40 @@ function App() {
     [queryText],
   )
 
+  const codeYearOptions = useMemo(
+    () => Array.from(new Set(redeemCodes.map((item) => item.date.slice(0, 4)))).sort().reverse(),
+    [],
+  )
+
+  const codeMonthOptions = Array.from({ length: 12 }, (_, index) =>
+    String(index + 1).padStart(2, '0'),
+  )
+
   const filteredCodes = useMemo(
     () =>
       redeemCodes
-        .filter((item) =>
-          [item.code, item.date, item.expiresAt, item.reward, item.status, item.source.label]
+        .filter((item) => {
+          const matchesQuery = [
+            item.code,
+            item.date,
+            item.expiresAt,
+            item.reward,
+            item.status,
+            item.source.label,
+          ]
             .join(' ')
             .toLowerCase()
-            .includes(queryText),
-        )
+            .includes(queryText)
+          const matchesYear = codeYearFilter === 'all' || item.date.startsWith(codeYearFilter)
+          const matchesMonth = codeMonthFilter === 'all' || item.date.slice(5, 7) === codeMonthFilter
+
+          return matchesQuery && matchesYear && matchesMonth
+        })
         .sort(
           (first, second) =>
             second.date.localeCompare(first.date) || first.code.localeCompare(second.code),
         ),
-    [queryText],
+    [codeMonthFilter, codeYearFilter, queryText],
   )
 
   const totalCodePages = Math.max(1, Math.ceil(filteredCodes.length / codesPerPage))
@@ -998,12 +1200,39 @@ function App() {
     (safeCodesPage - 1) * codesPerPage,
     safeCodesPage * codesPerPage,
   )
+  const visibleFaces = filteredFaces.slice(0, facesDisplayLimit)
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text)
-    setCopied(text)
-    window.setTimeout(() => setCopied(''), 1500)
+    setCopiedCodes((current) => (current.includes(text) ? current : [...current, text]))
   }
+
+  const codePagination = (
+    <div className="pagination">
+      <p>
+        共 {filteredCodes.length} 組，依日期由新到舊排序，每頁顯示 {codesPerPage} 組。
+      </p>
+      <div>
+        <button
+          disabled={safeCodesPage === 1}
+          onClick={() => setCodesPage((page) => Math.max(1, page - 1))}
+          type="button"
+        >
+          上一頁
+        </button>
+        <span>
+          第 {safeCodesPage} / {totalCodePages} 頁
+        </span>
+        <button
+          disabled={safeCodesPage === totalCodePages}
+          onClick={() => setCodesPage((page) => Math.min(totalCodePages, page + 1))}
+          type="button"
+        >
+          下一頁
+        </button>
+      </div>
+    </div>
+  )
 
   return (
     <main>
@@ -1012,7 +1241,7 @@ function App() {
           <p className="eyebrow">Where Winds Meet Lookup</p>
           <h1>燕雲十六聲資料查詢</h1>
           <p className="subtitle">
-            捏臉、戲樂、武學流派與 2026 年 5 月至今兌換碼整理。資料已標註來源，兌換碼有效性仍以遊戲內為準。
+            捏臉、戲樂、武學流派、臉碼轉換流程與 2026 年 5 月至今兌換碼整理。資料已標註來源，兌換碼有效性仍以遊戲內為準。
           </p>
         </div>
         <div className="status-panel" aria-label="資料狀態">
@@ -1049,20 +1278,41 @@ function App() {
         <section className="content-grid">
           <Notice
             title="萬相集來源說明"
-            text="官方公告確認遊戲可透過萬相集、二維碼或口令導入捏臉資料。下列口令取自標註為「遊戲內萬相集公開資料」的公開整理；若作品後續被作者改為不可套用，請以遊戲內顯示為準。"
+            text="官方公告確認遊戲可透過萬相集、二維碼或口令導入捏臉資料。TapTap 來源目前先標為陸服來源未驗證；若尚未轉換或未在國際服實測，請不要視為國際服可直接使用。"
           />
-          {filteredFaces.map((item) => (
+          <div className="face-filter-bar" aria-label="捏臉角色篩選">
+            {(['all', '女角', '男角'] as const).map((option) => (
+              <button
+                className={faceGenderFilter === option ? 'active' : ''}
+                key={option}
+                onClick={() => setFaceGenderFilter(option)}
+                type="button"
+              >
+                {option === 'all' ? '全部' : option}
+              </button>
+            ))}
+            <span>
+              目前顯示 {visibleFaces.length} / {filteredFaces.length} 筆
+            </span>
+          </div>
+          {visibleFaces.map((item) => (
             <article className="card face-card" key={item.code}>
+              <img className="face-preview" src={item.imageUrl} alt={`${item.name} 捏臉預覽`} />
               <div className="card-top">
                 <div>
                   <p className="kicker">{item.author}</p>
                   <h2>{item.name}</h2>
                 </div>
+              </div>
+              <span className={`face-source-status status-${getFaceSourceStatus(item)}`}>
+                {getFaceSourceStatus(item)}
+              </span>
+              <div className="code-copy-row">
+                <code>{item.code}</code>
                 <button type="button" onClick={() => copyText(item.code)}>
-                  {copied === item.code ? '已複製' : '複製'}
+                  {copiedCodes.includes(item.code) ? '已複製' : '複製'}
                 </button>
               </div>
-              <code>{item.code}</code>
               <p>{item.sourceNote}</p>
               <TagList tags={item.style} />
               <SourceLink source={item.source} />
@@ -1123,30 +1373,37 @@ function App() {
             title="兌換碼提醒"
             text="兌換路徑通常為：設定 -> 其他 -> 兌換碼。每筆兌換碼都會列出最後兌換時間；社群碼若未公告到期日，請以遊戲內回饋為準。"
           />
-          <div className="pagination">
-            <p>
-              共 {filteredCodes.length} 組，依日期由新到舊排序，每頁顯示 {codesPerPage} 組。
-            </p>
-            <div>
-              <button
-                disabled={safeCodesPage === 1}
-                onClick={() => setCodesPage((page) => Math.max(1, page - 1))}
-                type="button"
+          <div className="code-filter-bar">
+            <label>
+              <span>年份</span>
+              <select
+                onChange={(event) => setCodeYearFilter(event.target.value)}
+                value={codeYearFilter}
               >
-                上一頁
-              </button>
-              <span>
-                第 {safeCodesPage} / {totalCodePages} 頁
-              </span>
-              <button
-                disabled={safeCodesPage === totalCodePages}
-                onClick={() => setCodesPage((page) => Math.min(totalCodePages, page + 1))}
-                type="button"
+                <option value="all">全部年份</option>
+                {codeYearOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year} 年
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>月份</span>
+              <select
+                onChange={(event) => setCodeMonthFilter(event.target.value)}
+                value={codeMonthFilter}
               >
-                下一頁
-              </button>
-            </div>
+                <option value="all">全部月份</option>
+                {codeMonthOptions.map((month) => (
+                  <option key={month} value={month}>
+                    {Number(month)} 月
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
+          {codePagination}
           {pagedCodes.map((item) => (
             <article className="card code-card" key={`${item.code}-${item.date}`}>
               <div className="card-top">
@@ -1155,7 +1412,7 @@ function App() {
                   <h2>{item.code}</h2>
                 </div>
                 <button type="button" onClick={() => copyText(item.code)}>
-                  {copied === item.code ? '已複製' : '複製'}
+                  {copiedCodes.includes(item.code) ? '已複製' : '複製'}
                 </button>
               </div>
               <p>{item.reward}</p>
@@ -1167,6 +1424,65 @@ function App() {
               <SourceLink source={item.source} />
             </article>
           ))}
+          {codePagination}
+        </section>
+      )}
+
+      {activeTab === 'converter' && (
+        <section className="content-grid converter-grid">
+          <Notice
+            title="臉碼轉換狀態"
+            text="目前沒有官方公開的陸服轉國際服演算法或 API；此頁先作為待轉換與人工驗證流程。若之後取得可用轉換對照或可信工具，再把資料回填到國際服確認清單。"
+          />
+          <article className="card converter-card">
+            <p className="kicker">CN Code</p>
+            <h2>陸服臉碼</h2>
+            <textarea
+              onChange={(event) => setCnFaceCode(event.target.value)}
+              placeholder="貼上 TapTap / 陸服來源臉碼"
+              value={cnFaceCode}
+            />
+            <button type="button" onClick={() => copyText(cnFaceCode)} disabled={!cnFaceCode.trim()}>
+              {copiedCodes.includes(cnFaceCode) ? '已複製' : '複製陸服碼'}
+            </button>
+          </article>
+          <article className="card converter-card">
+            <p className="kicker">Global Code</p>
+            <h2>國際服臉碼</h2>
+            <textarea
+              onChange={(event) => setGlobalFaceCode(event.target.value)}
+              placeholder="轉換後、且已在國際服確認可用的臉碼可暫存在這裡"
+              value={globalFaceCode}
+            />
+            <button
+              type="button"
+              onClick={() => copyText(globalFaceCode)}
+              disabled={!globalFaceCode.trim()}
+            >
+              {copiedCodes.includes(globalFaceCode) ? '已複製' : '複製國際服碼'}
+            </button>
+          </article>
+          <article className="card converter-note">
+            <p className="kicker">Workflow</p>
+            <h2>建議流程</h2>
+            <ol>
+              <li>先把 TapTap 或陸服來源資料標成「陸服來源未驗證」。</li>
+              <li>使用可信社群工具或 Discord Bot 取得國際服碼。</li>
+              <li>在國際服實際匯入確認可用。</li>
+              <li>回填網站資料並改成「國際服確認」。</li>
+            </ol>
+            <TagList tags={['待轉換', '人工驗證', '可回填']} />
+          </article>
+          <article className="card converter-note">
+            <p className="kicker">References</p>
+            <h2>參考工具</h2>
+            <p>這些是社群工具或教學來源，不是官方轉碼 API；使用前仍建議自行確認安全性與可用性。</p>
+            <SourceLink source={{ label: 'WWM Presets 轉換工具', url: sources.wwmPresets }} />
+            <SourceLink source={{ label: 'Steam 社群轉換工具說明', url: sources.steamPresetBot }} />
+            <SourceLink source={{ label: '巴哈：陸服到國際服捏臉碼轉換分享', url: sources.bahaFaceConvert }} />
+            <SourceLink source={{ label: 'YouTube：陸服捏臉碼轉國際服教學', url: sources.youtubeFaceConvert }} />
+            <SourceLink source={{ label: 'Discord：WWM Workshop 轉換工具社群', url: sources.wwmWorkshopDiscord }} />
+          </article>
         </section>
       )}
     </main>
