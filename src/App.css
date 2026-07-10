@@ -1,0 +1,373 @@
+main {
+  min-height: 100vh;
+  min-width: 1180px;
+}
+
+.app-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 24px;
+  align-items: end;
+  min-height: 540px;
+  padding: 72px clamp(18px, 4vw, 56px) 40px;
+  background:
+    linear-gradient(90deg, rgba(5, 10, 18, 0.82) 0%, rgba(5, 10, 18, 0.58) 42%, rgba(5, 10, 18, 0.18) 100%),
+    linear-gradient(0deg, rgba(5, 10, 18, 0.72) 0%, rgba(5, 10, 18, 0.05) 46%),
+    url('/images/home-background.jpg') center / cover no-repeat;
+  border-bottom: 1px solid #1f2b37;
+  overflow: hidden;
+}
+
+.app-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow,
+.kicker {
+  margin: 0 0 8px;
+  color: #3b6b63;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  max-width: 820px;
+  color: #ffffff;
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 1.02;
+  font-weight: 800;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+  color: #172033;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+h3 {
+  color: #526071;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  max-width: 840px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 16px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.44);
+}
+
+.app-header .eyebrow {
+  color: #f1c876;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.42);
+}
+
+.status-panel {
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 8px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(14px);
+}
+
+.status-panel span {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.status-panel strong {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  padding: 18px clamp(18px, 4vw, 56px);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #d8dee8;
+  backdrop-filter: blur(14px);
+  min-width: 1180px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+button {
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  color: #172033;
+  background: #ffffff;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:hover {
+  border-color: #2f7f73;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(47, 127, 115, 0.28);
+  outline-offset: 2px;
+}
+
+.tabs button {
+  display: grid;
+  gap: 2px;
+  min-height: 64px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.tabs button.active {
+  color: #ffffff;
+  background: #22453f;
+  border-color: #22453f;
+}
+
+.tabs button span {
+  font-weight: 800;
+}
+
+.tabs button small {
+  color: inherit;
+  opacity: 0.74;
+  line-height: 1.25;
+}
+
+.search {
+  display: grid;
+  gap: 6px;
+  color: #526071;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.search input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 42px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #172033;
+  background: #ffffff;
+  font: 16px/1.2 system-ui, 'Microsoft JhengHei', sans-serif;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 24px clamp(18px, 4vw, 56px) 56px;
+}
+
+.code-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pagination {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  color: #526071;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  min-height: 36px;
+  padding: 0 14px;
+  font-weight: 800;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.pagination span {
+  min-width: 96px;
+  color: #172033;
+  font-weight: 800;
+  text-align: center;
+}
+
+.notice,
+.card {
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.notice {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-left: 5px solid #2f7f73;
+  background: #f5fbfa;
+}
+
+.notice p,
+.card p,
+.card li {
+  color: #526071;
+  line-height: 1.65;
+}
+
+.card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.card-top {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-top button {
+  flex: 0 0 auto;
+  min-width: 72px;
+  min-height: 36px;
+  padding: 0 12px;
+  color: #ffffff;
+  background: #2f7f73;
+  border-color: #2f7f73;
+  font-weight: 800;
+}
+
+code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 10px 12px;
+  color: #19342f;
+  background: #ecf7f5;
+  border: 1px solid #cce4df;
+  border-radius: 8px;
+  font: 15px/1.5 Consolas, 'Microsoft JhengHei', monospace;
+}
+
+ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tags span,
+.pill,
+.status {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #25433e;
+  background: #eef7f5;
+  border: 1px solid #cfe4df;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.weapons {
+  padding: 10px 12px;
+  color: #172033;
+  background: #f6f7fb;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.expiry {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  color: #172033;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.expiry strong {
+  color: #2f7f73;
+  font-size: 13px;
+}
+
+.expiry span {
+  color: #172033;
+  font-weight: 800;
+}
+
+.status-官方確認 {
+  color: #164e63;
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+
+.status-社群彙整 {
+  color: #365314;
+  background: #f7fee7;
+  border-color: #d9f99d;
+}
+
+.status-可能過期 {
+  color: #7c2d12;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.source-link {
+  color: #1d5f92;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.source-link:hover {
+  text-decoration: underline;
+}
