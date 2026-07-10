@@ -524,6 +524,12 @@ ol {
   border-color: #fed7aa;
 }
 
+.status-已過期 {
+  color: #7f1d1d;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
 .status-國際服確認 {
   color: #164e63;
   background: #ecfeff;

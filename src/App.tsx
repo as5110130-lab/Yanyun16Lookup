@@ -41,7 +41,7 @@ type RedeemCode = {
   date: string
   expiresAt: string
   reward: string
-  status: '官方確認' | '社群彙整' | '可能過期'
+  status: '官方確認' | '社群彙整' | '可能過期' | '已過期'
   source: Source
 }
 
@@ -435,9 +435,9 @@ const redeemCodes: RedeemCode[] = [
   {
     code: 'HEXI0306',
     date: '2026-06-03',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '回響玉 100、共鳴旋律 x1、錢幣 x20,000。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: 'BlueStacks 2026-06 禮包碼整理', url: sources.blueStacks },
   },
   {
@@ -467,49 +467,49 @@ const redeemCodes: RedeemCode[] = [
   {
     code: 'GOOSENEWS',
     date: '2026-06-03',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '回響玉 40、內道筆記寶箱 x1。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: 'BlueStacks 2026-06 禮包碼整理', url: sources.blueStacks },
   },
   {
     code: 'LIANGZHOUGO',
     date: '2026-06-03',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '回響玉 30、內道筆記寶箱 x1、錢幣 x3,000。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: 'BlueStacks 2026-06 禮包碼整理', url: sources.blueStacks },
   },
   {
     code: 'XDKHDDPPKN',
     date: '2026-06-18',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '6/18 社群彙整碼，獎勵以遊戲內收件匣為準。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: '社群近期禮包碼彙整', url: sources.bahaCodes },
   },
   {
     code: 'YQTWNQKJJE',
     date: '2026-06-19',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '6/19 社群彙整碼，獎勵以遊戲內收件匣為準。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: '社群近期禮包碼彙整', url: sources.bahaCodes },
   },
   {
     code: 'KTJWN6EQR6',
     date: '2026-06-19',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '6/19 社群彙整碼，獎勵以遊戲內收件匣為準。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: '社群近期禮包碼彙整', url: sources.bahaCodes },
   },
   {
     code: 'ESJCRRJC64',
     date: '2026-06-19',
-    expiresAt: '未公告，請以遊戲內為準',
+    expiresAt: '已過期',
     reward: '6/19 社群彙整碼，獎勵以遊戲內收件匣為準。',
-    status: '社群彙整',
+    status: '已過期',
     source: { label: '社群近期禮包碼彙整', url: sources.bahaCodes },
   },
   {
