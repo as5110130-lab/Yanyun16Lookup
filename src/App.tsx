@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
-type Tab = 'faces' | 'music' | 'martial' | 'codes' | 'converter'
+type Tab = 'home' | 'faces' | 'music' | 'martial' | 'codes' | 'converter'
 type Source = { label: string; url: string }
 
 type FacePreset = {
@@ -1083,6 +1083,7 @@ const redeemCodes: RedeemCode[] = [
 ]
 
 const tabMeta: Record<Tab, { label: string; hint: string }> = {
+  home: { label: '首頁', hint: '最新公告與網站更新' },
   faces: { label: '捏臉數據', hint: '官方萬相集公開口令與使用說明' },
   music: { label: '戲樂數據', hint: '戲樂模式、動作套用與版本狀態' },
   martial: { label: '武學流派', hint: '主副武學、心法、場景與難度' },
@@ -1091,7 +1092,7 @@ const tabMeta: Record<Tab, { label: string; hint: string }> = {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('codes')
+  const [activeTab, setActiveTab] = useState<Tab>('home')
   const [query, setQuery] = useState('')
   const [copiedCodes, setCopiedCodes] = useState<string[]>([])
   const [faceGenderFilter, setFaceGenderFilter] = useState<'all' | '女角' | '男角'>('all')
@@ -1273,6 +1274,12 @@ function App() {
           />
         </label>
       </section>
+
+      {activeTab === 'home' && (
+        <section className="content-grid home-grid">
+          <Notice title="公告" text="家園改版" />
+        </section>
+      )}
 
       {activeTab === 'faces' && (
         <section className="content-grid">
