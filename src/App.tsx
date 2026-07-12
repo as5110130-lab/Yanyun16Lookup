@@ -16,8 +16,8 @@ type FacePreset = {
 
 type FaceSourceStatus = '國際服確認' | '陸服來源未驗證'
 type CodeExpiryFilter = 'all' | 'active' | 'expired' | 'uncertain'
-type CodeViewFilter = 'all' | 'latest7' | 'copied' | 'uncopied'
 type DataStatusFilter = 'all' | 'confirmed' | 'needsReview' | 'missing' | 'scaffold'
+type CodeReportTopic = '過期' | '無效' | '其他'
 
 type DataEntry = {
   name: string
@@ -1550,31 +1550,25 @@ const formatDataEntry = (sectionTitle: string, item: DataEntry) =>
     `來源：${item.source.label}`,
   ].join('\n')
 
-const createExpiredCodeReportUrl = (codes: RedeemCode[]) => {
-  const title =
-    codes.length === 1
-      ? `回報過期兌換碼：${codes[0].code}`
-      : `回報過期兌換碼：${codes.length} 組`
+const createCodeReportUrl = (code: string, topic: CodeReportTopic, message: string) => {
+  const title = `回報兌換碼${topic}：${code || '未填寫兌換碼'}`
   const body = [
-    '## 回報過期兌換碼',
+    '## 兌換碼回報',
     '',
-    '請在下方補充實際測試結果，例如遊戲內顯示「已過期」、「已使用」或「無效」。',
+    `回報主題：${topic}`,
+    `兌換碼：${code || '未填寫'}`,
+    `留言：${message || '未填寫'}`,
     '',
-    '### 兌換碼',
-    ...codes.map((item) => `- ${item.code}｜整理日期：${item.date}｜目前狀態：${item.status}｜最後兌換時間：${item.expiresAt}`),
-    '',
-    '### 回報內容',
     '- 測試日期：',
     '- 遊戲伺服器：國際服 / 台港澳 / 全球服',
     '- 遊戲內提示：',
-    '- 補充截圖或說明：',
     '',
     `網站頁面：${window.location.href}`,
   ].join('\n')
   const params = new URLSearchParams({
     title,
     body,
-    labels: '兌換碼,過期回報',
+    labels: '兌換碼,回報',
   })
 
   return `${sources.githubExpiredReport}?${params.toString()}`
@@ -2341,7 +2335,9 @@ function App() {
   const [codeYearFilter, setCodeYearFilter] = useState('all')
   const [codeMonthFilter, setCodeMonthFilter] = useState('all')
   const [codeExpiryFilter, setCodeExpiryFilter] = useState<CodeExpiryFilter>('all')
-  const [codeViewFilter, setCodeViewFilter] = useState<CodeViewFilter>('all')
+  const [codeReportCode, setCodeReportCode] = useState('')
+  const [codeReportTopic, setCodeReportTopic] = useState<CodeReportTopic>('過期')
+  const [codeReportMessage, setCodeReportMessage] = useState('')
   const [activeDataSection, setActiveDataSection] = useState('all')
   const [equipmentTierFilter, setEquipmentTierFilter] = useState('all')
   const [dataStatusFilter, setDataStatusFilter] = useState<DataStatusFilter>('all')
@@ -2823,7 +2819,7 @@ function App() {
 
   useEffect(() => {
     setCodesPage(1)
-  }, [queryText, codeYearFilter, codeMonthFilter, codeExpiryFilter, codeViewFilter])
+  }, [queryText, codeYearFilter, codeMonthFilter, codeExpiryFilter])
 
   useEffect(() => {
     const saved = window.localStorage.getItem('yanyun-builder-builds')
@@ -2930,9 +2926,6 @@ function App() {
     .map((item) => item.date)
     .sort()
     .at(-1)
-  const latestCodeCutoff = newestCodeDate
-    ? new Date(new Date(`${newestCodeDate}T00:00:00+08:00`).getTime() - 6 * 24 * 60 * 60 * 1000)
-    : null
   const codeStatusSummary = {
     active: redeemCodes.filter((item) => item.status === '官方確認' || item.status === '社群彙整').length,
     expired: redeemCodes.filter((item) => item.status === '已過期').length,
@@ -2963,20 +2956,14 @@ function App() {
               (item.status === '官方確認' || item.status === '社群彙整')) ||
             (codeExpiryFilter === 'expired' && item.status === '已過期') ||
             (codeExpiryFilter === 'uncertain' && item.status === '可能過期')
-          const itemDate = new Date(`${item.date}T00:00:00+08:00`)
-          const matchesView =
-            codeViewFilter === 'all' ||
-            (codeViewFilter === 'latest7' && latestCodeCutoff && itemDate >= latestCodeCutoff) ||
-            (codeViewFilter === 'copied' && copiedCodes.includes(item.code)) ||
-            (codeViewFilter === 'uncopied' && !copiedCodes.includes(item.code))
 
-          return matchesQuery && matchesYear && matchesMonth && matchesExpiry && matchesView
+          return matchesQuery && matchesYear && matchesMonth && matchesExpiry
         })
         .sort(
           (first, second) =>
             second.date.localeCompare(first.date) || first.code.localeCompare(second.code),
         ),
-    [codeExpiryFilter, codeMonthFilter, codeViewFilter, codeYearFilter, copiedCodes, latestCodeCutoff, queryText],
+    [codeExpiryFilter, codeMonthFilter, codeYearFilter, queryText],
   )
 
   const totalCodePages = Math.max(1, Math.ceil(filteredCodes.length / codesPerPage))
@@ -2992,32 +2979,18 @@ function App() {
     setCopiedCodes((current) => (current.includes(text) ? current : [...current, text]))
   }
 
-  const copyPagedRedeemCodes = async () => {
-    const codes = pagedCodes.map((item) => item.code)
-
-    await navigator.clipboard.writeText(codes.join('\n'))
-    setCopiedCodes((current) => Array.from(new Set([...current, ...codes])))
+  const fillCodeReport = (code: string) => {
+    setCodeReportCode(code)
+    setCodeReportTopic('過期')
+    setCodeReportMessage('')
   }
 
-  const copyFilteredRedeemCodes = async () => {
-    const codes = filteredCodes.map((item) => item.code)
-
-    await navigator.clipboard.writeText(codes.join('\n'))
-    setCopiedCodes((current) => Array.from(new Set([...current, ...codes])))
-  }
-
-  const exportFilteredRedeemCodes = () => {
-    const content = filteredCodes
-      .map((item) => `${item.date}\t${item.code}\t${item.status}\t${item.expiresAt}`)
-      .join('\n')
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-
-    link.href = url
-    link.download = '燕雲兌換碼篩選結果.txt'
-    link.click()
-    URL.revokeObjectURL(url)
+  const openCodeReport = () => {
+    window.open(
+      createCodeReportUrl(codeReportCode.trim(), codeReportTopic, codeReportMessage.trim()),
+      '_blank',
+      'noopener,noreferrer',
+    )
   }
 
   const codePagination = (
@@ -3832,7 +3805,7 @@ function App() {
         <section className="content-grid code-grid">
           <Notice
             title="兌換碼提醒"
-            text="兌換路徑通常為：設定 -> 其他 -> 兌換碼。每筆兌換碼都會列出最後兌換時間；社群碼若未公告到期日，請以遊戲內回饋為準。若使用者回報過期，會開啟 GitHub 回報單，仍需站長人工確認後更新。"
+            text="兌換路徑通常為：設定 -> 其他 -> 兌換碼。每筆兌換碼都會列出最後兌換時間；社群碼若未公告到期日，請以遊戲內回饋為準。回報表單會開啟 GitHub 回報單，仍需站長人工確認後更新。"
           />
           <div className="code-stats-grid">
             <section>
@@ -3902,46 +3875,51 @@ function App() {
               </select>
             </label>
           </div>
-          <div className="code-actions-bar">
-            <span>
-              本頁已複製 {pagedCodes.filter((item) => copiedCodes.includes(item.code)).length} / {pagedCodes.length} 組
-            </span>
-            {[
-              ['all', '全部'],
-              ['latest7', '最新 7 天'],
-              ['uncopied', '未複製'],
-              ['copied', '已複製'],
-            ].map(([value, label]) => (
-              <button
-                className={codeViewFilter === value ? 'active' : ''}
-                key={value}
-                onClick={() => setCodeViewFilter(value as CodeViewFilter)}
-                type="button"
-              >
-                {label}
+          <article className="card code-report-panel">
+            <div>
+              <p className="kicker">回報</p>
+              <h2>回報兌換碼狀態</h2>
+            </div>
+            <div className="code-report-grid">
+              <label>
+                <span>回報主題</span>
+                <select
+                  onChange={(event) => setCodeReportTopic(event.target.value as CodeReportTopic)}
+                  value={codeReportTopic}
+                >
+                  <option value="過期">過期</option>
+                  <option value="無效">無效</option>
+                  <option value="其他">其他</option>
+                </select>
+              </label>
+              <label>
+                <span>兌換碼</span>
+                <input
+                  onChange={(event) => setCodeReportCode(event.target.value.toUpperCase())}
+                  placeholder="可貼上或點下方單筆填入"
+                  value={codeReportCode}
+                />
+              </label>
+            </div>
+            <label className="code-report-message">
+              <span>留言，最多 100 字</span>
+              <textarea
+                maxLength={100}
+                onChange={(event) => setCodeReportMessage(event.target.value.slice(0, 100))}
+                placeholder="例如：7/12 測試顯示已過期"
+                value={codeReportMessage}
+              />
+              <small>{codeReportMessage.length} / 100</small>
+            </label>
+            <div className="code-report-actions">
+              <button type="button" onClick={() => copyText(codeReportCode)} disabled={!codeReportCode.trim()}>
+                複製回報碼
               </button>
-            ))}
-            <button type="button" onClick={copyPagedRedeemCodes} disabled={pagedCodes.length === 0}>
-              複製本頁全部
-            </button>
-            <button type="button" onClick={copyFilteredRedeemCodes} disabled={filteredCodes.length === 0}>
-              複製篩選全部
-            </button>
-            <button type="button" onClick={exportFilteredRedeemCodes} disabled={filteredCodes.length === 0}>
-              匯出篩選結果
-            </button>
-            <a
-              className={`action-link ${pagedCodes.length === 0 ? 'disabled' : ''}`}
-              href={pagedCodes.length === 0 ? undefined : createExpiredCodeReportUrl(pagedCodes)}
-              rel="noreferrer"
-              target="_blank"
-            >
-              回報本頁過期
-            </a>
-            <button type="button" onClick={() => setCopiedCodes([])} disabled={copiedCodes.length === 0}>
-              清除複製紀錄
-            </button>
-          </div>
+              <button type="button" onClick={openCodeReport} disabled={!codeReportCode.trim()}>
+                送出回報
+              </button>
+            </div>
+          </article>
           {codePagination}
           {pagedCodes.map((item) => (
             <article className="card code-card" key={`${item.code}-${item.date}`}>
@@ -3960,14 +3938,9 @@ function App() {
                 <span>{item.expiresAt}</span>
               </p>
               <span className={`status status-${item.status}`}>{item.status}</span>
-              <a
-                className="report-expired-link"
-                href={createExpiredCodeReportUrl([item])}
-                rel="noreferrer"
-                target="_blank"
-              >
-                回報過期
-              </a>
+              <button className="report-expired-link" type="button" onClick={() => fillCodeReport(item.code)}>
+                填入回報
+              </button>
               <SourceLink source={item.source} />
             </article>
           ))}

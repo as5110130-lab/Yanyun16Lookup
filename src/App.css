@@ -559,33 +559,6 @@ button:disabled {
   font-weight: 800;
 }
 
-.code-actions-bar {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  color: #526071;
-  background: #ffffff;
-  border: 1px solid #d8dee8;
-  border-radius: 8px;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
-}
-
-.code-actions-bar span {
-  margin-right: auto;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.code-actions-bar button {
-  min-height: 36px;
-  padding: 0 12px;
-  font-weight: 800;
-}
-
-.action-link,
 .report-expired-link {
   display: inline-flex;
   width: fit-content;
@@ -601,28 +574,72 @@ button:disabled {
   text-decoration: none;
 }
 
-.action-link:hover,
 .report-expired-link:hover {
   border-color: #2f7f73;
-}
-
-.action-link.disabled {
-  pointer-events: none;
-  color: #94a3b8;
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-}
-
-.code-actions-bar button.active {
-  color: #ffffff;
-  background: #22453f;
-  border-color: #22453f;
 }
 
 .report-expired-link {
   color: #7c2d12;
   background: #fff7ed;
   border-color: #fed7aa;
+}
+
+.code-report-panel {
+  grid-column: 1 / -1;
+}
+
+.code-report-grid {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.code-report-grid label,
+.code-report-message {
+  display: grid;
+  gap: 6px;
+  color: #526071;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.code-report-grid select,
+.code-report-grid input,
+.code-report-message textarea {
+  min-height: 38px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #172033;
+  background: #ffffff;
+  font: 15px/1.2 system-ui, 'Microsoft JhengHei', sans-serif;
+}
+
+.code-report-message textarea {
+  min-height: 88px;
+  padding: 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.code-report-message small {
+  justify-self: end;
+  color: #64748b;
+}
+
+.code-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.code-report-actions button {
+  min-height: 36px;
+  padding: 0 12px;
+  color: #ffffff;
+  background: #2f7f73;
+  border-color: #2f7f73;
+  font-weight: 800;
 }
 
 .code-filter-bar label {
@@ -1364,7 +1381,8 @@ ol {
   .builder-gear-row,
   .quick-set-panel,
   .builder-set-overview,
-  .builder-check-list > div {
+  .builder-check-list > div,
+  .code-report-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1387,15 +1405,10 @@ ol {
   }
 
   .code-filter-bar,
-  .code-actions-bar,
   .face-filter-bar,
   .pagination {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .code-actions-bar span {
-    margin-right: 0;
   }
 
   .face-filter-bar span {
