@@ -585,10 +585,44 @@ button:disabled {
   font-weight: 800;
 }
 
+.action-link,
+.report-expired-link {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.action-link:hover,
+.report-expired-link:hover {
+  border-color: #2f7f73;
+}
+
+.action-link.disabled {
+  pointer-events: none;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
 .code-actions-bar button.active {
   color: #ffffff;
   background: #22453f;
   border-color: #22453f;
+}
+
+.report-expired-link {
+  color: #7c2d12;
+  background: #fff7ed;
+  border-color: #fed7aa;
 }
 
 .code-filter-bar label {

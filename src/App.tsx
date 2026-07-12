@@ -131,6 +131,8 @@ const sources = {
     'https://www.facebook.com/61585429144951/posts/new-redeem-codewwmbind01pic-for-attention-%EF%B8%8Fwherewindsmeet-wwm/122121750387180971/',
   facebookPalace:
     'https://www.facebook.com/groups/1031152431953437/posts/1563044495430892/',
+  githubExpiredReport:
+    'https://github.com/as5110130-lab/Yanyun16Lookup/issues/new',
   arlenCodes: 'https://www.arlenfuture.com/games/where-winds-meet-codes/',
   wwmPresets: 'https://wwmpresets.com/',
   steamPresetBot: 'https://steamcommunity.com/sharedfiles/filedetails/?id=3625052726',
@@ -1547,6 +1549,36 @@ const formatDataEntry = (sectionTitle: string, item: DataEntry) =>
     `標籤：${item.tags.join('、')}`,
     `來源：${item.source.label}`,
   ].join('\n')
+
+const createExpiredCodeReportUrl = (codes: RedeemCode[]) => {
+  const title =
+    codes.length === 1
+      ? `回報過期兌換碼：${codes[0].code}`
+      : `回報過期兌換碼：${codes.length} 組`
+  const body = [
+    '## 回報過期兌換碼',
+    '',
+    '請在下方補充實際測試結果，例如遊戲內顯示「已過期」、「已使用」或「無效」。',
+    '',
+    '### 兌換碼',
+    ...codes.map((item) => `- ${item.code}｜整理日期：${item.date}｜目前狀態：${item.status}｜最後兌換時間：${item.expiresAt}`),
+    '',
+    '### 回報內容',
+    '- 測試日期：',
+    '- 遊戲伺服器：國際服 / 台港澳 / 全球服',
+    '- 遊戲內提示：',
+    '- 補充截圖或說明：',
+    '',
+    `網站頁面：${window.location.href}`,
+  ].join('\n')
+  const params = new URLSearchParams({
+    title,
+    body,
+    labels: '兌換碼,過期回報',
+  })
+
+  return `${sources.githubExpiredReport}?${params.toString()}`
+}
 
 const createEmptyGearSelection = (): BuilderGearSelection => ({
   set: '',
@@ -3800,7 +3832,7 @@ function App() {
         <section className="content-grid code-grid">
           <Notice
             title="兌換碼提醒"
-            text="兌換路徑通常為：設定 -> 其他 -> 兌換碼。每筆兌換碼都會列出最後兌換時間；社群碼若未公告到期日，請以遊戲內回饋為準。"
+            text="兌換路徑通常為：設定 -> 其他 -> 兌換碼。每筆兌換碼都會列出最後兌換時間；社群碼若未公告到期日，請以遊戲內回饋為準。若使用者回報過期，會開啟 GitHub 回報單，仍需站長人工確認後更新。"
           />
           <div className="code-stats-grid">
             <section>
@@ -3898,6 +3930,14 @@ function App() {
             <button type="button" onClick={exportFilteredRedeemCodes} disabled={filteredCodes.length === 0}>
               匯出篩選結果
             </button>
+            <a
+              className={`action-link ${pagedCodes.length === 0 ? 'disabled' : ''}`}
+              href={pagedCodes.length === 0 ? undefined : createExpiredCodeReportUrl(pagedCodes)}
+              rel="noreferrer"
+              target="_blank"
+            >
+              回報本頁過期
+            </a>
             <button type="button" onClick={() => setCopiedCodes([])} disabled={copiedCodes.length === 0}>
               清除複製紀錄
             </button>
@@ -3920,6 +3960,14 @@ function App() {
                 <span>{item.expiresAt}</span>
               </p>
               <span className={`status status-${item.status}`}>{item.status}</span>
+              <a
+                className="report-expired-link"
+                href={createExpiredCodeReportUrl([item])}
+                rel="noreferrer"
+                target="_blank"
+              >
+                回報過期
+              </a>
               <SourceLink source={item.source} />
             </article>
           ))}
