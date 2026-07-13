@@ -408,9 +408,44 @@ button:disabled {
   align-items: start;
 }
 
+.weapon-detail {
+  display: grid;
+  gap: 12px;
+}
+
+.martial-icon-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.martial-icon-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 54px;
+  padding: 8px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.martial-icon-item img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  padding: 3px;
+  background: #172033;
+  border-radius: 8px;
+}
+
 .data-status-tags,
 .data-filter-bar,
-.tier-filter-bar {
+.tier-filter-bar,
+.miracle-filter-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -453,7 +488,8 @@ button:disabled {
 }
 
 .data-filter-bar,
-.tier-filter-bar {
+.tier-filter-bar,
+.miracle-filter-bar {
   padding: 12px;
   background: #ffffff;
   border: 1px solid #d8dee8;
@@ -462,21 +498,24 @@ button:disabled {
 }
 
 .data-filter-bar span,
-.tier-filter-bar span {
+.tier-filter-bar span,
+.miracle-filter-bar span {
   color: #526071;
   font-size: 13px;
   font-weight: 800;
 }
 
 .data-filter-bar button,
-.tier-filter-bar button {
+.tier-filter-bar button,
+.miracle-filter-bar button {
   min-height: 34px;
   padding: 0 12px;
   font-weight: 800;
 }
 
 .data-filter-bar button.active,
-.tier-filter-bar button.active {
+.tier-filter-bar button.active,
+.miracle-filter-bar button.active {
   color: #ffffff;
   background: #22453f;
   border-color: #22453f;
@@ -763,6 +802,42 @@ button:disabled {
   font: 15px/1.2 system-ui, 'Microsoft JhengHei', sans-serif;
 }
 
+.builder-selected-skill {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.builder-selected-skill img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  padding: 3px;
+  background: #172033;
+  border-radius: 8px;
+}
+
+.builder-selected-skill span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.builder-selected-skill strong {
+  color: #172033;
+  font-size: 13px;
+}
+
+.builder-selected-skill small {
+  color: #526071;
+  font-weight: 700;
+}
+
 .builder-build-note {
   display: grid;
   gap: 6px;
@@ -805,6 +880,28 @@ button:disabled {
 .builder-preview-card small,
 .builder-set-overview small {
   color: #526071;
+}
+
+.builder-preview-content {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.builder-preview-content > div {
+  display: grid;
+  gap: 4px;
+}
+
+.builder-preview-icon {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  padding: 4px;
+  background: #172033;
+  border: 1px solid rgba(47, 127, 115, 0.34);
+  border-radius: 8px;
 }
 
 .builder-preview-list,
@@ -992,6 +1089,78 @@ button:disabled {
 .builder-check-list strong {
   color: #2f7f73;
   font-size: 12px;
+}
+
+.builder-miracle-overview {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  color: #526071;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.builder-miracle-overview h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+}
+
+.builder-miracle-overview > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.builder-miracle-overview span {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 42px;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.builder-miracle-overview span.empty {
+  grid-template-columns: auto minmax(0, 1fr);
+  color: #94a3b8;
+  background: #f8fafc;
+}
+
+.builder-miracle-overview strong {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: #ffffff;
+  background: #22453f;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.builder-miracle-overview img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  padding: 2px;
+  background: #172033;
+  border-radius: 8px;
+}
+
+.builder-miracle-overview small {
+  overflow: hidden;
+  color: #172033;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-miracle-overview span.empty small {
+  color: #94a3b8;
 }
 
 .saved-build-list,

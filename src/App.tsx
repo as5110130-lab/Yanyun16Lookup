@@ -18,6 +18,7 @@ type FaceSourceStatus = '國際服確認' | '陸服來源未驗證'
 type CodeExpiryFilter = 'all' | 'active' | 'expired' | 'uncertain'
 type DataStatusFilter = 'all' | 'confirmed' | 'needsReview' | 'missing' | 'scaffold'
 type CodeReportTopic = '過期' | '無效' | '其他'
+type MiracleCategoryFilter = 'all' | '攻擊型' | '控制型' | '輔助型' | '探索型' | '生存' | 'PVE'
 
 type DataEntry = {
   name: string
@@ -94,6 +95,16 @@ type SavedBuilderBuild = BuilderState & {
 const today = '2026-07-12'
 const codesPerPage = 10
 const facesDisplayLimit = 30
+const miracleSlotCount = 8
+const miracleCategoryOptions: { value: MiracleCategoryFilter; label: string }[] = [
+  { value: 'all', label: '全部' },
+  { value: '攻擊型', label: '攻擊型' },
+  { value: '控制型', label: '控制型' },
+  { value: '輔助型', label: '輔助型' },
+  { value: '探索型', label: '探索型' },
+  { value: '生存', label: '生存' },
+  { value: 'PVE', label: 'PVE' },
+]
 
 const sources = {
   officialFace:
@@ -173,6 +184,25 @@ const mysticSkillIcons: Record<string, string> = {
   太極: 'https://hwres.oslink.io/rcmnq/gw/image/NrJpNH-1765521529407.webp',
   凌雲踏: 'https://hwres.oslink.io/rcmnq/gw/image/8MjKRR-1765521550555.webp',
   擒星拿月: 'https://hwres.oslink.io/rcmnq/gw/image/bG7zBH-1765521569917.webp',
+}
+
+const martialArtIcons: Record<string, string> = {
+  無名劍法: 'https://img.game8.co/4331129/77b21e0bf5e89a2b56ec428ad539790e.png/show',
+  積矩九劍: 'https://img.game8.co/4331134/8a36324f07a767dfdf96d0a4a44d53e0.png/show',
+  無名槍法: 'https://img.game8.co/4331136/6b761bc6828f99151a4aa642a8a62189.png/show',
+  九曲驚神槍: 'https://img.game8.co/4331140/cb8ca4a2628cfa314f57093b439ddbe8.png/show',
+  八方風雷槍: 'https://img.game8.co/4331133/75c9ac76d2976e4f975f6a3ae2168558.png/show',
+  十方破陣: 'https://img.game8.co/4379371/9e29ccb3c7098715eb1fcdd70c92b7a1.png/show',
+  嗟夫刀法: 'https://img.game8.co/4331132/6ed777b5efce723ef006466cd0af82b4.png/show',
+  九重春色: 'https://img.game8.co/4331139/93c90a21eb6db4dc78ab626eeaa897d5.png/show',
+  千香引魂蠱: 'https://img.game8.co/4331131/18d8da0221d8b6097c9b9b769f210b2b.png/show',
+  醉夢遊春: 'https://img.game8.co/4331139/93c90a21eb6db4dc78ab626eeaa897d5.png/show',
+  青山執筆: 'https://img.game8.co/4331137/a0072135916f15e728532b63809870fe.png/show',
+  明川藥典: 'https://img.game8.co/4331130/238c76e9c24a5e8cdd0696ce15d8bddb.png/show',
+  粟子行雲: 'https://img.game8.co/4331135/d8110f837c4c6cc0ec60ad7308af2914.png/show',
+  粟子遊塵: 'https://img.game8.co/4331135/d8110f837c4c6cc0ec60ad7308af2914.png/show',
+  斬雪刀法: 'https://img.game8.co/4379371/9e29ccb3c7098715eb1fcdd70c92b7a1.png/show',
+  天志垂象: 'https://img.game8.co/4331138/86eafaaa238d530270e4e83a468fec0d.png/show',
 }
 
 const createMindsetEntry = (
@@ -1927,9 +1957,34 @@ const defaultBuilderState: BuilderState = {
   arsenal: getItemNames('武庫資料')[0] ?? '',
   gear: createDefaultBuilderGear(),
   mindsets: ['', '', '', ''],
-  miracles: ['', '', ''],
+  miracles: Array(miracleSlotCount).fill(''),
   notes: '',
 }
+
+const normalizeMiracleSlots = (miracles: string[] = []) => {
+  const used = new Set<string>()
+  const normalized = miracles.map((name) => {
+    if (!name || used.has(name)) {
+      return ''
+    }
+
+    used.add(name)
+    return name
+  })
+
+  return [...normalized, ...Array(miracleSlotCount).fill('')].slice(0, miracleSlotCount)
+}
+
+const normalizeBuilderState = (build: Partial<BuilderState>): BuilderState => ({
+  ...defaultBuilderState,
+  ...build,
+  gear: {
+    ...createDefaultBuilderGear(),
+    ...(build.gear ?? {}),
+  },
+  mindsets: [...(build.mindsets ?? []), '', '', '', ''].slice(0, 4),
+  miracles: normalizeMiracleSlots(build.miracles),
+})
 
 const redeemCodes: RedeemCode[] = [
   {
@@ -2673,6 +2728,7 @@ function App() {
   const [activeDataSection, setActiveDataSection] = useState('all')
   const [equipmentTierFilter, setEquipmentTierFilter] = useState('all')
   const [dataStatusFilter, setDataStatusFilter] = useState<DataStatusFilter>('all')
+  const [miracleCategoryFilter, setMiracleCategoryFilter] = useState<MiracleCategoryFilter>('all')
   const [expandedDataEntry, setExpandedDataEntry] = useState('')
   const [builder, setBuilder] = useState<BuilderState>(defaultBuilderState)
   const [savedBuilds, setSavedBuilds] = useState<SavedBuilderBuild[]>([])
@@ -2708,6 +2764,7 @@ function App() {
     .filter(Boolean)
     .map((name) => getDataEntryByName('奇術資料', name))
     .filter((item): item is DataEntry => Boolean(item))
+  const getSelectedMiracleEntry = (name: string) => getDataEntryByName('奇術資料', name)
   const gearSetCounts = builderGearSlots.reduce<Record<string, number>>((counts, slot) => {
     const setName = builder.gear[slot].set
 
@@ -2765,7 +2822,7 @@ function App() {
     { label: '詞綴部位', value: `${gearSlotsWithAffixes}/${builderGearSlots.length}` },
     { label: '定音部位', value: `${gearSlotsWithTuning}/${builderGearSlots.length}` },
     { label: '心法', value: `${builder.mindsets.filter(Boolean).length}/4` },
-    { label: '奇術', value: `${builder.miracles.filter(Boolean).length}/3` },
+    { label: '奇術', value: `${builder.miracles.filter(Boolean).length}/${miracleSlotCount}` },
   ]
   const filteredSavedBuilds = savedBuilds.filter((item) =>
     [item.title, item.buildName, item.equipmentTier, item.mainWeapon, item.subWeapon]
@@ -2805,8 +2862,9 @@ function App() {
 
   const saveCurrentBuild = () => {
     const title = builder.title.trim() || '未命名配置'
+    const normalizedBuilder = normalizeBuilderState({ ...builder, title })
     const savedBuild: SavedBuilderBuild = {
-      ...builder,
+      ...normalizedBuilder,
       title,
       savedAt: new Date().toISOString(),
     }
@@ -2815,7 +2873,7 @@ function App() {
       savedBuild,
       ...current.filter((item) => item.title !== title),
     ])
-    setBuilder((current) => ({ ...current, title }))
+    setBuilder(normalizedBuilder)
   }
 
   const loadSavedBuild = (title: string) => {
@@ -2826,7 +2884,7 @@ function App() {
     }
 
     const { savedAt: _savedAt, ...build } = savedBuild
-    setBuilder(build)
+    setBuilder(normalizeBuilderState(build))
   }
 
   const deleteSavedBuild = (title: string) => {
@@ -2879,7 +2937,7 @@ function App() {
     const title = builder.title.trim() || '未命名配置'
     downloadBuildJson(`${title}.json`, [
       {
-        ...builder,
+        ...normalizeBuilderState({ ...builder, title }),
         title,
         savedAt: new Date().toISOString(),
       },
@@ -2909,14 +2967,7 @@ function App() {
         (item) => item && typeof item.title === 'string' && item.gear && Array.isArray(item.mindsets),
       )
       const normalizedImported = imported.map((item) => ({
-        ...defaultBuilderState,
-        ...item,
-        gear: {
-          ...createDefaultBuilderGear(),
-          ...item.gear,
-        },
-        mindsets: [...item.mindsets, '', '', '', ''].slice(0, 4),
-        miracles: [...(item.miracles ?? []), '', '', ''].slice(0, 3),
+        ...normalizeBuilderState(item),
         savedAt: item.savedAt || new Date().toISOString(),
       }))
 
@@ -2934,7 +2985,7 @@ function App() {
         const { savedAt: _savedAt, ...build } = {
           ...firstImported,
         }
-        setBuilder(build)
+        setBuilder(normalizeBuilderState(build))
       }
       setBuildImportText('')
       setBuildImportMessage(`已匯入 ${normalizedImported.length} 筆配置。`)
@@ -3100,7 +3151,12 @@ function App() {
   ) => {
     setBuilder((current) => ({
       ...current,
-      [key]: current[key].map((item, itemIndex) => (itemIndex === index ? value : item)),
+      [key]:
+        key === 'miracles'
+          ? normalizeMiracleSlots(
+              current.miracles.map((item, itemIndex) => (itemIndex === index ? value : item)),
+            )
+          : current[key].map((item, itemIndex) => (itemIndex === index ? value : item)),
     }))
   }
 
@@ -3162,7 +3218,14 @@ function App() {
 
     try {
       const parsed = JSON.parse(saved) as SavedBuilderBuild[]
-      setSavedBuilds(Array.isArray(parsed) ? parsed : [])
+      setSavedBuilds(
+        Array.isArray(parsed)
+          ? parsed.map((item) => ({
+              ...normalizeBuilderState(item),
+              savedAt: item.savedAt || new Date().toISOString(),
+            }))
+          : [],
+      )
     } catch {
       setSavedBuilds([])
     }
@@ -3174,6 +3237,7 @@ function App() {
 
   useEffect(() => {
     setExpandedDataEntry('')
+    setMiracleCategoryFilter('all')
   }, [activeDataSection, queryText])
 
   const filteredFaces = useMemo(
@@ -3231,6 +3295,11 @@ function App() {
               section.title !== '裝備等階' ||
               equipmentTierFilter === 'all' ||
               item.name === equipmentTierFilter
+            const matchesMiracleCategory =
+              section.title !== '奇術資料' ||
+              miracleCategoryFilter === 'all' ||
+              item.tags.includes(miracleCategoryFilter) ||
+              item.details.some((detail) => detail.includes(miracleCategoryFilter))
             const statusTags = getDataStatusTags(item)
             const matchesStatus =
               dataStatusFilter === 'all' ||
@@ -3239,11 +3308,11 @@ function App() {
               (dataStatusFilter === 'missing' && statusTags.includes('待補資料')) ||
               (dataStatusFilter === 'scaffold' && statusTags.includes('架構已建立'))
 
-            return matchesQuery && matchesTier && matchesStatus
+            return matchesQuery && matchesTier && matchesMiracleCategory && matchesStatus
           }),
         }))
         .filter((section) => section.items.length > 0),
-    [activeDataSection, dataStatusFilter, equipmentTierFilter, queryText],
+    [activeDataSection, dataStatusFilter, equipmentTierFilter, miracleCategoryFilter, queryText],
   )
 
   const codeYearOptions = useMemo(
@@ -3501,6 +3570,21 @@ function App() {
                 ))}
               </div>
             )}
+            {(activeDataSection === 'all' || activeDataSection === '奇術資料') && (
+              <div className="miracle-filter-bar" aria-label="奇術類型篩選">
+                <span>奇術類型</span>
+                {miracleCategoryOptions.map((option) => (
+                  <button
+                    className={miracleCategoryFilter === option.value ? 'active' : ''}
+                    key={option.value}
+                    onClick={() => setMiracleCategoryFilter(option.value)}
+                    type="button"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
             {filteredDataSections.length === 0 && (
               <article className="card empty-state">
                 <h2>沒有找到資料</h2>
@@ -3665,6 +3749,15 @@ function App() {
                       </option>
                     ))}
                   </select>
+                  {builder.mainMartial && martialArtIcons[builder.mainMartial] && (
+                    <span className="builder-selected-skill">
+                      <img src={martialArtIcons[builder.mainMartial]} alt={`${builder.mainMartial} 圖示`} loading="lazy" />
+                      <span>
+                        <strong>{builder.mainMartial}</strong>
+                        <small>{builder.mainWeapon || '未選武器'}</small>
+                      </span>
+                    </span>
+                  )}
                 </label>
                 <label>
                   <span>副武器</span>
@@ -3697,6 +3790,15 @@ function App() {
                       </option>
                     ))}
                   </select>
+                  {builder.subMartial && martialArtIcons[builder.subMartial] && (
+                    <span className="builder-selected-skill">
+                      <img src={martialArtIcons[builder.subMartial]} alt={`${builder.subMartial} 圖示`} loading="lazy" />
+                      <span>
+                        <strong>{builder.subMartial}</strong>
+                        <small>{builder.subWeapon || '未選武器'}</small>
+                      </span>
+                    </span>
+                  )}
                 </label>
               </div>
               {selectedBuild && (
@@ -3901,7 +4003,7 @@ function App() {
                     setBuilder((current) => ({
                       ...current,
                       mindsets: ['', '', '', ''],
-                      miracles: ['', '', ''],
+                      miracles: Array(miracleSlotCount).fill(''),
                     }))
                   }
                 >
@@ -3925,22 +4027,39 @@ function App() {
                     </select>
                   </label>
                 ))}
-                {builder.miracles.map((value, index) => (
-                  <label key={`miracle-${index + 1}`}>
-                    <span>奇術 {index + 1}</span>
-                    <select
-                      onChange={(event) => updateBuilderArray('miracles', index, event.target.value)}
-                      value={value}
-                    >
-                      <option value="">未選擇</option>
-                      {miracleOptions.map((name) => (
-                        <option key={name} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
+                {builder.miracles.map((value, index) => {
+                  const selectedMiracle = getSelectedMiracleEntry(value)
+                  const selectedMiracleNames = builder.miracles.filter((name, selectedIndex) => Boolean(name) && selectedIndex !== index)
+                  const availableMiracleOptions = miracleOptions.filter(
+                    (name) => name === value || !selectedMiracleNames.includes(name),
+                  )
+
+                  return (
+                    <label key={`miracle-${index + 1}`}>
+                      <span>奇術 {index + 1}</span>
+                      <select
+                        onChange={(event) => updateBuilderArray('miracles', index, event.target.value)}
+                        value={value}
+                      >
+                        <option value="">未選擇</option>
+                        {availableMiracleOptions.map((name) => (
+                          <option key={name} value={name}>
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedMiracle?.iconUrl && (
+                        <span className="builder-selected-skill">
+                          <img src={selectedMiracle.iconUrl} alt={`${selectedMiracle.name} 圖示`} loading="lazy" />
+                          <span>
+                            <strong>{selectedMiracle.name}</strong>
+                            <small>{getDetailValue(selectedMiracle, '分類') || selectedMiracle.tags.slice(1).join(' / ')}</small>
+                          </span>
+                        </span>
+                      )}
+                    </label>
+                  )
+                })}
               </div>
               <label className="builder-notes">
                 <span>備註</span>
@@ -3954,16 +4073,30 @@ function App() {
                 <div className="builder-preview-list">
                   {selectedMindsetEntries.map((item) => (
                     <section className="builder-preview-card" key={item.name}>
-                      <strong>{item.name}</strong>
-                      <span>{getDetailValue(item, '定位') || item.summary}</span>
-                      <small>{getDetailValue(item, '基礎效果') || '基礎效果待補。'}</small>
+                      <div className="builder-preview-content">
+                        {item.iconUrl && (
+                          <img className="builder-preview-icon" src={item.iconUrl} alt={`${item.name} 圖示`} />
+                        )}
+                        <div>
+                          <strong>{item.name}</strong>
+                          <span>{getDetailValue(item, '定位') || item.summary}</span>
+                          <small>{getDetailValue(item, '基礎效果') || '基礎效果待補。'}</small>
+                        </div>
+                      </div>
                     </section>
                   ))}
                   {selectedMiracleEntries.map((item) => (
                     <section className="builder-preview-card" key={item.name}>
-                      <strong>{item.name}</strong>
-                      <span>{item.summary}</span>
-                      <small>{item.details[0] ?? '詳細資料待補。'}</small>
+                      <div className="builder-preview-content">
+                        {item.iconUrl && (
+                          <img className="builder-preview-icon" src={item.iconUrl} alt={`${item.name} 圖示`} />
+                        )}
+                        <div>
+                          <strong>{item.name}</strong>
+                          <span>{item.summary}</span>
+                          <small>{item.details[0] ?? '詳細資料待補。'}</small>
+                        </div>
+                      </div>
                     </section>
                   ))}
                 </div>
@@ -4007,6 +4140,22 @@ function App() {
                       {item.value}
                     </span>
                   ))}
+                </div>
+              </div>
+              <div className="builder-miracle-overview">
+                <h3>奇術配置</h3>
+                <div>
+                  {builder.miracles.map((name, index) => {
+                    const miracle = getSelectedMiracleEntry(name)
+
+                    return (
+                      <span className={miracle ? '' : 'empty'} key={`summary-miracle-${index + 1}`}>
+                        <strong>{index + 1}</strong>
+                        {miracle?.iconUrl && <img src={miracle.iconUrl} alt={`${miracle.name} 圖示`} loading="lazy" />}
+                        <small>{miracle?.name || '未選擇'}</small>
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
               <div className="builder-actions">
@@ -4424,6 +4573,38 @@ function DataDetails({ sectionTitle, item }: { sectionTitle: string; item: DataE
           })}
         </div>
         {note && <p className="build-note">{note}</p>}
+      </div>
+    )
+  }
+
+  if (sectionTitle === '武器資料') {
+    const martialDetails = item.details.filter((detail) => detail.startsWith('可用武學：'))
+    const otherDetails = item.details.filter((detail) => !detail.startsWith('可用武學：'))
+
+    return (
+      <div className="data-detail-panel weapon-detail">
+        {martialDetails.length > 0 && (
+          <div className="martial-icon-list">
+            {martialDetails.map((detail) => {
+              const name = detail.replace('可用武學：', '').trim()
+              const iconUrl = martialArtIcons[name]
+
+              return (
+                <span className="martial-icon-item" key={detail}>
+                  {iconUrl && <img src={iconUrl} alt={`${name} 圖示`} loading="lazy" />}
+                  <strong>{name}</strong>
+                </span>
+              )
+            })}
+          </div>
+        )}
+        {otherDetails.length > 0 && (
+          <ol>
+            {otherDetails.map((detail) => (
+              <li key={detail}>{detail}</li>
+            ))}
+          </ol>
+        )}
       </div>
     )
   }
