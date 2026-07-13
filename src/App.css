@@ -1313,6 +1313,28 @@ ol {
   text-decoration: underline;
 }
 
+.site-footer {
+  display: flex;
+  justify-content: center;
+  padding: 0 clamp(18px, 4vw, 56px) 48px;
+}
+
+.site-footer button {
+  min-width: 160px;
+  min-height: 44px;
+  padding: 10px 22px;
+  color: #ffffff;
+  font-weight: 900;
+  background: #22453f;
+  border-color: #22453f;
+  box-shadow: 0 12px 28px rgba(34, 69, 63, 0.18);
+}
+
+.site-footer button:hover {
+  background: #2f7f73;
+  border-color: #2f7f73;
+}
+
 @media (max-width: 760px) {
   main {
     min-width: 0;
@@ -1429,5 +1451,13 @@ ol {
 
   .code-copy-row button {
     min-height: 38px;
+  }
+
+  .site-footer {
+    padding: 0 14px 34px;
+  }
+
+  .site-footer button {
+    width: 100%;
   }
 }

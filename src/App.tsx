@@ -2993,6 +2993,10 @@ function App() {
     )
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const codePagination = (
     <div className="pagination">
       <p>
@@ -4005,6 +4009,12 @@ function App() {
           </article>
         </section>
       )}
+
+      <footer className="site-footer">
+        <button type="button" onClick={scrollToTop}>
+          回到頁首
+        </button>
+      </footer>
     </main>
   )
 }
