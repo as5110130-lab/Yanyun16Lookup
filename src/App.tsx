@@ -25,6 +25,7 @@ type DataEntry = {
   details: string[]
   tags: string[]
   source: Source
+  iconUrl?: string
 }
 
 type DataSection = {
@@ -146,6 +147,32 @@ const sources = {
   youtubeJulyCodes: 'https://www.youtube.com/post/UgkxDtv_rgo58IPJSaOVp0nYQKHF_co1Fy5Y',
   musicGuide: 'https://news.17173.com/content/11022025/192549381.shtml',
   musicForum: 'https://forum.gamer.com.tw/C.php?bsn=75703&snA=6014',
+}
+
+const mysticSkillIcons: Record<string, string> = {
+  獅吼正聲: 'https://hwres.oslink.io/rcmnq/gw/image/xiPhfJ-1765521063732.webp',
+  金蟾騰躍: 'https://hwres.oslink.io/rcmnq/gw/image/T5RNxi-1765521082196.webp',
+  百鬼打穴手: 'https://hwres.oslink.io/rcmnq/gw/image/PhEmYk-1765521100703.webp',
+  韋陀正法: 'https://hwres.oslink.io/rcmnq/gw/image/RQA8F8-1765521144205.webp',
+  流星墜火: 'https://hwres.oslink.io/rcmnq/gw/image/5S4nBY-1765521166134.webp',
+  神龍吐火: 'https://hwres.oslink.io/rcmnq/gw/image/CXRK6P-1765521182886.webp',
+  太白醉月: 'https://hwres.oslink.io/rcmnq/gw/image/RtRdSS-1765521200903.webp',
+  葉龍鏢首: 'https://hwres.oslink.io/rcmnq/gw/image/yHZMMB-1765521217254.webp',
+  鷹爪連鑿: 'https://hwres.oslink.io/rcmnq/gw/image/Gpd4RZ-1765521275083.webp',
+  藥叉破魔: 'https://hwres.oslink.io/rcmnq/gw/image/rDZHYM-1765521292115.webp',
+  自在無礙: 'https://hwres.oslink.io/rcmnq/gw/image/eYbC6T-1765521313464.webp',
+  狗嘴奪食: 'https://hwres.oslink.io/rcmnq/gw/image/adfEQ8-1765521334535.webp',
+  騎龍回馬: 'https://hwres.oslink.io/rcmnq/gw/image/DBrW3B-1765521362285.webp',
+  紅塵障目: 'https://hwres.oslink.io/rcmnq/gw/image/MmeePk-1765521381747.webp',
+  螢光暉夜: 'https://hwres.oslink.io/rcmnq/gw/image/axmAbJ-1765521402329.webp',
+  清風霽月: 'https://hwres.oslink.io/rcmnq/gw/image/ASzPDB-1765521418412.webp',
+  杳無形: 'https://hwres.oslink.io/rcmnq/gw/image/Ps2ahz-1765521449635.webp',
+  無相金身: 'https://hwres.oslink.io/rcmnq/gw/image/SAc8Qi-1765521466851.webp',
+  陰陽迷蹤步: 'https://hwres.oslink.io/rcmnq/gw/image/2npt5G-1765521487425.webp',
+  金玉手: 'https://hwres.oslink.io/rcmnq/gw/image/QMNFEh-1765521505680.webp',
+  太極: 'https://hwres.oslink.io/rcmnq/gw/image/NrJpNH-1765521529407.webp',
+  凌雲踏: 'https://hwres.oslink.io/rcmnq/gw/image/8MjKRR-1765521550555.webp',
+  擒星拿月: 'https://hwres.oslink.io/rcmnq/gw/image/bG7zBH-1765521569917.webp',
 }
 
 const createMindsetEntry = (
@@ -1049,6 +1076,7 @@ const buildDataSections: DataSection[] = [
     items: [
       {
         name: '獅吼正聲',
+        iconUrl: mysticSkillIcons['獅吼正聲'],
         summary: '範圍輸出與減傷型奇術，適合清怪與承壓時補傷害。',
         details: [
           '分類：攻擊型',
@@ -1062,6 +1090,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '金蟾騰躍',
+        iconUrl: mysticSkillIcons['金蟾騰躍'],
         summary: '多段位移打擊與蟾毒效果，偏輸出與控制銜接。',
         details: [
           '分類：攻擊型',
@@ -1075,6 +1104,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '百鬼打穴手',
+        iconUrl: mysticSkillIcons['百鬼打穴手'],
         summary: '群體定身與破真氣點控制奇術。',
         details: [
           '分類：攻擊型 / 控制型',
@@ -1088,6 +1118,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '韋陀正法',
+        iconUrl: mysticSkillIcons['韋陀正法'],
         summary: '空中下砸與範圍掌擊奇術。',
         details: [
           '分類：攻擊型',
@@ -1101,6 +1132,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '流星墜火',
+        iconUrl: mysticSkillIcons['流星墜火'],
         summary: '範圍爆發型奇術，偏 PVE 清怪與爆發。',
         details: [
           '分類：攻擊型',
@@ -1114,6 +1146,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '神龍吐火',
+        iconUrl: mysticSkillIcons['神龍吐火'],
         summary: '火焰持續傷害奇術，可與醉酒系效果聯動。',
         details: [
           '分類：攻擊型',
@@ -1127,6 +1160,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '太白醉月',
+        iconUrl: mysticSkillIcons['太白醉月'],
         summary: '醉酒連擊型奇術，適合搭配神龍吐火。',
         details: [
           '分類：攻擊型',
@@ -1140,6 +1174,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '葉龍鏢首',
+        iconUrl: mysticSkillIcons['葉龍鏢首'],
         summary: '快速突進打擊奇術，偏單體爆發。',
         details: [
           '分類：攻擊型',
@@ -1153,6 +1188,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '鷹爪連鑿',
+        iconUrl: mysticSkillIcons['鷹爪連鑿'],
         summary: '破防連擊奇術，用於打破防禦姿態。',
         details: [
           '分類：控制型',
@@ -1166,6 +1202,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '藥叉破魔',
+        iconUrl: mysticSkillIcons['藥叉破魔'],
         summary: '突進與擊飛型控制奇術。',
         details: [
           '分類：控制型',
@@ -1179,6 +1216,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '自在無礙',
+        iconUrl: mysticSkillIcons['自在無礙'],
         summary: '偏反制與高壓輸出的控制奇術。',
         details: [
           '分類：控制型',
@@ -1192,6 +1230,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '狗嘴奪食',
+        iconUrl: mysticSkillIcons['狗嘴奪食'],
         summary: '踩踏與擊倒型奇術，兼具探索跳躍與戰鬥控制。',
         details: [
           '分類：控制型 / 探索型',
@@ -1205,6 +1244,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '騎龍回馬',
+        iconUrl: mysticSkillIcons['騎龍回馬'],
         summary: '打斷與突進控制奇術，PVE/PVP 都常被推薦。',
         details: [
           '分類：控制型',
@@ -1218,6 +1258,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '紅塵障目',
+        iconUrl: mysticSkillIcons['紅塵障目'],
         summary: '致盲與干擾型輔助奇術。',
         details: [
           '分類：輔助型',
@@ -1231,6 +1272,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '螢光暉夜',
+        iconUrl: mysticSkillIcons['螢光暉夜'],
         summary: '照明與探索輔助奇術。',
         details: [
           '分類：輔助型 / 探索型',
@@ -1244,6 +1286,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '清風霽月',
+        iconUrl: mysticSkillIcons['清風霽月'],
         summary: '反制與削弱耐力恢復的通用奇術。',
         details: [
           '分類：輔助型 / 通用型',
@@ -1257,6 +1300,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '杳無形',
+        iconUrl: mysticSkillIcons['杳無形'],
         summary: '潛行與隱蔽輔助奇術。',
         details: [
           '分類：輔助型',
@@ -1270,6 +1314,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '無相金身',
+        iconUrl: mysticSkillIcons['無相金身'],
         summary: '生存型奇術，可提供護盾與真氣恢復。',
         details: [
           '分類：輔助型 / 生存型',
@@ -1283,6 +1328,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '陰陽迷蹤步',
+        iconUrl: mysticSkillIcons['陰陽迷蹤步'],
         summary: '閃避消耗降低的機動輔助奇術。',
         details: [
           '分類：輔助型',
@@ -1296,6 +1342,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '金玉手',
+        iconUrl: mysticSkillIcons['金玉手'],
         summary: '點穴與定身類探索/控制奇術。',
         details: [
           '分類：探索型 / 控制型',
@@ -1309,6 +1356,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '太極',
+        iconUrl: mysticSkillIcons['太極'],
         summary: '牽引與反制型奇術，可互動場景物件。',
         details: [
           '分類：探索型 / 攻擊型',
@@ -1322,6 +1370,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '凌雲踏',
+        iconUrl: mysticSkillIcons['凌雲踏'],
         summary: '高跳與踩踏型探索/戰鬥奇術。',
         details: [
           '分類：探索型 / 控制型',
@@ -1335,6 +1384,7 @@ const buildDataSections: DataSection[] = [
       },
       {
         name: '擒星拿月',
+        iconUrl: mysticSkillIcons['擒星拿月'],
         summary: '隔空取物與奪械型探索/戰鬥奇術。',
         details: [
           '分類：探索型 / 攻擊型',
@@ -3470,9 +3520,19 @@ function App() {
                   {section.items.map((item) => (
                     <section className="data-entry" key={`${section.title}-${item.name}`}>
                       <div className="card-top">
-                        <div>
-                          <h3>{item.name}</h3>
-                          <p>{item.summary}</p>
+                        <div className="data-entry-main">
+                          {item.iconUrl && (
+                            <img
+                              className="data-entry-icon"
+                              src={item.iconUrl}
+                              alt={`${item.name} 圖示`}
+                              loading="lazy"
+                            />
+                          )}
+                          <div>
+                            <h3>{item.name}</h3>
+                            <p>{item.summary}</p>
+                          </div>
                         </div>
                         <button
                           type="button"
